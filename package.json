@@ -1,0 +1,21 @@
+{
+  "name": "blog-management-assignment",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Full-Stack Blog Management System (Metier Thailand's Assignment)",
+  "workspaces": [
+    "apps/frontend",
+    "apps/backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "dev:backend": "npm run start:dev --workspace=apps/backend",
+    "build:frontend": "npm run build --workspace=apps/frontend",
+    "build:backend": "npm run build --workspace=apps/backend",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
