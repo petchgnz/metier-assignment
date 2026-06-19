@@ -27,7 +27,7 @@ enum CommentStatus {
 // region: Models
 model Admin {
   id             Int    @id @default(autoincrement())
-  email          String
+  email          String @unique
   hashedPassword String
 
   createdAt DateTime @default(now())
