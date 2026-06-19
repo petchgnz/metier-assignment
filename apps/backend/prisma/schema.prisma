@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// region: Enums
+enum BlogStatus {
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// region: Models
+model Admin {
+  id             Int    @id @default(autoincrement())
+  email          String
+  hashedPassword String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Blog {
+  id Int @id @default(autoincrement())
+
+  title         String
+  slug          String     @unique
+  excerpt       String
+  content       String
+  coverImageUrl String
+  viewCount     Int        @default(0)
+  status        BlogStatus @default(UNPUBLISHED)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  images   BlogImage[]
+  comments Comment[]
+
+  @@index([status])
+  @@index([slug])
+  @@map("blogs")
+}
+
+model BlogImage {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String
+  blogId    Int
+  createdAt DateTime @default(now())
+
+  blog Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  @@index([blogId])
+  @@map("blog_images")
+}
+
+model Comment {
+  id         Int           @id @default(autoincrement())
+  authorName String
+  content    String
+  status     CommentStatus @default(PENDING)
+  blogId     Int
+  createdAt  DateTime      @default(now())
+
+  blog Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  @@index([blogId])
+  @@index([status])
+  @@map("comments")
+}
