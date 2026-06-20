@@ -8,14 +8,16 @@ import {
   Patch,
   UseGuards,
   Delete,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog-.dto';
 import { UpdateSlugDto } from './dto/update-slug.dto';
-import { deepEqual } from 'assert';
-import { ParamsTokenFactory } from '@nestjs/core/pipes';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('admin/blogs')
 @UseGuards(JwtAuthGuard)
@@ -71,5 +73,67 @@ export class AdminBlogController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.blogService.remove(id);
+  }
+
+  // Images Section
+  // update cover images
+  @Post(':id/cover-image')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (req, file, callback) => {
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowed.includes(file.mimetype)) {
+          return callback(
+            new BadRequestException(
+              `Invalid file type. Only JPEG, PNG, WebP allowed`,
+            ),
+            false,
+          );
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  updateCoverImage(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.blogService.updateCoverImage(id, file);
+  }
+
+  // add additional image
+  @Post(':id/images')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (req, file, callback) => {
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowed.includes(file.mimetype)) {
+          return callback(
+            new BadRequestException(
+              `Invalid file type. Only JPEG, PNG, WebP allowed`,
+            ),
+            false,
+          );
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  addAdditionalImage(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.blogService.addAdditionalImage(id, file);
+  }
+
+  //remove image
+  @Delete(':id/images/:imageId')
+  removeAdditionalImage(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('imageId', ParseIntPipe) imageId: number,
+  ) {
+    return this.blogService.removeAdditionalImage(id, imageId);
   }
 }

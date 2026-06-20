@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -14,12 +15,17 @@ import { CreateBlogDto } from './dto/create-blog.dto';
 import { slugify } from './utils/slugify';
 import { UpdateSlugDto } from './dto/update-slug.dto';
 import { UpdateBlogDto } from './dto/update-blog-.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 const PAGE_SIZE = 10;
+const MAX_ADDITIONAL_IMAGES = 6;
 
 @Injectable()
 export class BlogService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cloudinary: CloudinaryService,
+  ) {}
 
   // public services (no auth)
   async findPublished(query: QueryBlogDto) {
@@ -169,9 +175,83 @@ export class BlogService {
   }
 
   async remove(id: number) {
-    await this.findOneForAdmin(id);
+    const blog = await this.findOneForAdmin(id);
+
+    // collect all image urls
+    const allImageUrls = [
+      blog.coverImageUrl,
+      ...blog.images.map((img) => img.imageUrl),
+    ];
+
+    // remove from cloudinary
+    await Promise.allSettled(
+      allImageUrls.filter(Boolean).map((url) => {
+        const publicId = this.cloudinary.extractPublicId(url);
+        return this.cloudinary.deleteImage(publicId);
+      }),
+    );
+
+    // this one will automatically delete blogImage data (cascade del)
     await this.prisma.blog.delete({ where: { id } });
+
     return { message: 'Blog deleted successfully' };
+  }
+
+  // cover images
+  async updateCoverImage(blogId: number, file: Express.Multer.File) {
+    const blog = await this.findOneForAdmin(blogId);
+
+    const uploadResult = await this.cloudinary.uploadImage(file, 'covers');
+
+    // if a blog already have a coverImage, delete the old one
+    if (blog.coverImageUrl) {
+      const oldPublicId = this.cloudinary.extractPublicId(blog.coverImageUrl);
+      await this.cloudinary.deleteImage(oldPublicId).catch(() => {}); //leave it blank cuz we don't want the whole function to break here
+    }
+
+    return await this.prisma.blog.update({
+      where: { id: blogId },
+      data: { coverImageUrl: uploadResult.secure_url },
+    });
+  }
+
+  // additional images
+  async addAdditionalImage(blogId: number, file: Express.Multer.File) {
+    const blog = await this.prisma.blog.findUnique({
+      where: { id: blogId },
+      include: { _count: { select: { images: true } } },
+    });
+
+    if (!blog) throw new NotFoundException(`Blog with id ${blogId} not found`);
+    if (blog._count.images >= MAX_ADDITIONAL_IMAGES)
+      throw new BadRequestException(
+        `Maximum ${MAX_ADDITIONAL_IMAGES} additional images allowed per blog`,
+      );
+
+    const uploadResult = await this.cloudinary.uploadImage(file, 'additional');
+    return await this.prisma.blogImage.create({
+      data: {
+        blogId,
+        imageUrl: uploadResult.secure_url,
+      },
+    });
+  }
+
+  async removeAdditionalImage(blogId: number, imageId: number) {
+    const image = await this.prisma.blogImage.findUnique({
+      where: { id: imageId },
+    });
+
+    if (!image || image.blogId !== blogId) {
+      throw new NotFoundException(`Image not found for this blog`);
+    }
+
+    //remove from cloudinary with publicId
+    const publicId = this.cloudinary.extractPublicId(image.imageUrl);
+    await this.cloudinary.deleteImage(publicId).catch(() => {});
+
+    await this.prisma.blogImage.delete({ where: { id: imageId } });
+    return { message: `Image removed successfully` };
   }
 
   // helpers

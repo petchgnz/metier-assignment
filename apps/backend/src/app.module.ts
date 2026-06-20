@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { BlogModule } from './blog/blog.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { BlogModule } from './blog/blog.module';
     AuthModule,
     PrismaModule,
     BlogModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
