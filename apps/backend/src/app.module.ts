@@ -7,6 +7,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { BlogModule } from './blog/blog.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     PrismaModule,
     BlogModule,
     CloudinaryModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

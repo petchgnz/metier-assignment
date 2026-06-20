@@ -95,7 +95,7 @@ export class BlogService {
 
   // admin services
   async findAllForAdmin() {
-    await this.prisma.blog.findMany({
+    return await this.prisma.blog.findMany({
       orderBy: { createdAt: 'desc' },
       include: { _count: { select: { comments: true, images: true } } },
     });
