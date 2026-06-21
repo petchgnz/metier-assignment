@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
+import { TOKEN_COOKIE_NAME } from './constants';
 
-export const TOKEN_COOKIE_NAME = 'admin_token';
 
 //set auth token to cookies
 export function setAuthToken(token: string) {
