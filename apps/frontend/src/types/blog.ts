@@ -50,3 +50,32 @@ export interface BlogDetail {
   images: BlogImage[];
   comments: Comment[];
 }
+
+// Admin
+export interface AdminBlogListItem {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  coverImageUrl: string;
+  viewCount: number;
+  status: 'PUBLISHED' | 'UNPUBLISHED';
+  createdAt: string;
+  updatedAt: string;
+  _count: { comments: number; images: number };
+}
+
+export interface AdminBlogDetail {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  coverImageUrl: string;
+  viewCount: number;
+  status: BlogStatus;
+  createdAt: string;
+  updatedAt: string;
+  images: BlogImage[];
+}

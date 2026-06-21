@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUrl,
-  MaxLength,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, isURL, MaxLength } from 'class-validator';
 
 export class CreateBlogDto {
   @ApiProperty()
@@ -31,7 +25,7 @@ export class CreateBlogDto {
   content!: string;
 
   @ApiProperty()
-  @IsUrl()
+  @IsString()
   @IsNotEmpty({ message: 'Cover image URL is required' })
   coverImageUrl!: string;
 }

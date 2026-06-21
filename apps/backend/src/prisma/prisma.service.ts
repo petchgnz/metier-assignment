@@ -1,4 +1,9 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
@@ -15,11 +20,18 @@ export class PrismaService
     super({ adapter });
   }
 
-  async onModuleDestroy(): Promise<void> {
-    await this.$disconnect();
+  async onModuleInit(): Promise<void> {
+    try {
+      await this.$connect();
+      console.log('Database connected successfully');
+    } catch (err) {
+      console.log('Unable to connect to PostgreSQL. Is Docker running? ', err);
+
+      process.exit();
+    }
   }
 
-  async onModuleInit(): Promise<void> {
-    await this.$connect();
+  async onModuleDestroy(): Promise<void> {
+    await this.$disconnect();
   }
 }
