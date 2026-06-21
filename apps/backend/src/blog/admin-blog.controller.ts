@@ -1,4 +1,11 @@
 import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConflictResponse,
+  ApiConsumes,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
   Body,
   Controller,
   Get,
@@ -19,6 +26,8 @@ import { UpdateBlogDto } from './dto/update-blog-.dto';
 import { UpdateSlugDto } from './dto/update-slug.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiTags('Blogs (Admin)')
+@ApiBearerAuth('access-token')
 @Controller('admin/blogs')
 @UseGuards(JwtAuthGuard)
 export class AdminBlogController {
@@ -31,7 +40,7 @@ export class AdminBlogController {
   }
 
   //find one
-  @Get()
+  @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.blogService.findOneForAdmin(id);
   }
@@ -78,6 +87,15 @@ export class AdminBlogController {
   // Images Section
   // update cover images
   @Post(':id/cover-image')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       limits: { fileSize: 5 * 1024 * 1024 },
@@ -104,6 +122,15 @@ export class AdminBlogController {
 
   // add additional image
   @Post(':id/images')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       limits: { fileSize: 5 * 1024 * 1024 },
