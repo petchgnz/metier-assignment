@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { CommentService } from './comment.service';
 import {
   Body,
@@ -9,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 
+@ApiTags('Comments (Public)')
 @Controller('blogs/:slug/comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}

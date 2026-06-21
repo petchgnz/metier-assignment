@@ -1,3 +1,4 @@
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   Controller,
   Get,
@@ -11,6 +12,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CommentService } from './comment.service';
 import { CommentStatus } from '@prisma/client';
 
+@ApiTags('Comments (Admin)')
+@ApiBearerAuth('access-token')
 @Controller('admin/comments')
 @UseGuards(JwtAuthGuard)
 export class AdminCommentController {

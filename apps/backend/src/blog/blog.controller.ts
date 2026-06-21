@@ -1,7 +1,9 @@
+import { ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { QueryBlogDto } from './dto/query-blog.dto';
 
+@ApiTags('Blogs (Public)')
 @Controller('blogs')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
