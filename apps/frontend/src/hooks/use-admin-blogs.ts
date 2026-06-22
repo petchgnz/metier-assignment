@@ -118,8 +118,8 @@ export function useUpdateBlog(id: number) {
 export function useUpdateSlug(id: number) {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (slug: Partial<BlogFormInput>) => {
+  return useMutation<AdminBlogDetail, Error, string>({
+    mutationFn: async (slug: Partial<AdminBlogDetail>) => {
       const { data } = await apiClient.patch<AdminBlogDetail>(
         `/admin/blogs/${id}/slug`,
         { slug },
