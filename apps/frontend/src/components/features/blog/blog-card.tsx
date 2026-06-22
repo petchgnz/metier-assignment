@@ -17,7 +17,7 @@ export function BlogCard({ blog }: { blog: BlogListItem }) {
           <Image src={blog.coverImageUrl} alt={blog.title} fill className="object-cover" />
         </div>
         <CardContent className="p-4">
-          <h2 className="font-semibold text-lg line-clamp-2">{blog.title}</h2>
+          <h2 className="font-semibold text-lg line-clamp-2 font-heading">{blog.title}</h2>
           <p className="text-muted-foreground text-sm mt-2 line-clamp-3">{blog.excerpt}</p>
           <div>
             <p className="text-xs text-muted-foreground mt-3">
