@@ -10,7 +10,12 @@ import { setAuthToken } from '@/lib/auth-token';
 import { loginSchema, LoginInput } from '@/lib/validations/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Field, FieldLabel, FieldError, FieldGroup } from '@/components/ui/field';
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+} from '@/components/ui/field';
 
 interface LoginResponse {
   accessToken: string;
@@ -25,7 +30,8 @@ export function LoginForm() {
   });
 
   const mutation = useMutation({
-    mutationFn: (input: LoginInput) => apiClient.post<LoginResponse>('/auth/login', input),
+    mutationFn: (input: LoginInput) =>
+      apiClient.post<LoginResponse>('/auth/login', input),
     onSuccess: (response) => {
       setAuthToken(response.data.accessToken);
       toast.success('ยินดีต้อนรับ!');
@@ -44,18 +50,23 @@ export function LoginForm() {
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
         <Controller
-          name="email"
+          name='email'
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={field.name}>อีเมล</FieldLabel>
-              <Input {...field} id={field.name} autoComplete="username" aria-invalid={fieldState.invalid} />
+              <Input
+                {...field}
+                id={field.name}
+                autoComplete='username'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
         <Controller
-          name="password"
+          name='password'
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
@@ -63,17 +74,28 @@ export function LoginForm() {
               <Input
                 {...field}
                 id={field.name}
-                type="password"
-                autoComplete="current-password"
+                type='password'
+                autoComplete='current-password'
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
-        <Button type="submit" disabled={mutation.isPending} className="w-full">
+        <Button
+          type='submit'
+          disabled={mutation.isPending}
+          className='w-full'
+        >
           {mutation.isPending ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
         </Button>
+
+        <p className='mt-6 rounded-lg bg-muted p-3 text-center text-xs text-muted-foreground'>
+          ทดลองใช้งาน — อีเมล:{' '}
+          <span className='font-bold'>admin@gmail.com</span> /
+          รหัสผ่าน:{' '}
+          <span className='font-bold'>admin1234</span>
+        </p>
       </FieldGroup>
     </form>
   );
