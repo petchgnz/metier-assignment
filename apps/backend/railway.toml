@@ -7,3 +7,6 @@ startCommand = "npm run start:prod"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"
+
+[variables]
+NIXPACKS_NODE_VERSION = "22"
