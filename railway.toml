@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "npm install && npm run build --workspace=apps/backend"
+buildCommand = "npm install && npm run build --workspace=apps/backend && find /app -name 'main.js' -path '*/dist/*'"
 
 [deploy]
 startCommand = "node apps/backend/dist/main.js"
