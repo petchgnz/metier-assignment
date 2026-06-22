@@ -1,21 +1,32 @@
 import { LoginForm } from '@/components/features/admin/login-form';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center px-4'>
-      <div className=''>
-        <Link href={'/blogs'}>go back home</Link>
-      </div>
+    <div className='min-h-screen flex items-center justify-center px-3'>
+      <div className='w-full max-w-sm'>
+        <Link
+          href='/'
+          className='mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground'
+        >
+          <ArrowLeft className='h-3 w-4' />
+          Back to Homepage
+        </Link>
 
-      <div className='w-full max-w-sm space-y-6 rounded-2xl border border-border bg-card p-8'>
-        <div className='text-center'>
-          <h1 className='text-2xl font-bold'>เข้าสู่ระบบผู้ดูแล</h1>
-          <p className='text-muted-foreground text-sm mt-1'>
-            สำหรับผู้ดูแลระบบเท่านั้น
-          </p>
+        <div className='space-y-5 rounded-2xl border border-border bg-card p-8'>
+          <div className='text-center'>
+            <h2 className='text-2xl font-bold font-heading'>
+              เข้าสู่ระบบผู้ดูแล
+            </h2>
+
+            <p className='mt-2 text-sm text-muted-foreground'>
+              กรุณาเข้าสู่ระบบเพื่อจัดการบทความและความคิดเห็น
+            </p>
+          </div>
+
+          <LoginForm />
         </div>
-        <LoginForm />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   useAdminComments,
@@ -13,14 +14,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 
 const dateFormatter = new Intl.DateTimeFormat('th-TH', {
   year: 'numeric',
@@ -62,95 +55,104 @@ export default function AdminCommentsPage() {
     });
   }
 
+  // นับจำนวนแต่ละ status สำหรับแสดงใน tab label
+  const counts = {
+    PENDING: useAdminComments('PENDING').data?.length ?? 0,
+    APPROVED: useAdminComments('APPROVED').data?.length ?? 0,
+    REJECTED: useAdminComments('REJECTED').data?.length ?? 0,
+  };
+
   return (
     <div>
-      <h1 className='text-2xl font-bold mb-6'>จัดการความคิดเห็น</h1>
-
       <Tabs
         value={filter}
         onValueChange={(v) => setFilter(v as CommentStatusFilter)}
         className='mb-6'
       >
         <TabsList>
-          <TabsTrigger value='PENDING'>รออนุมัติ</TabsTrigger>
-          <TabsTrigger value='APPROVED'>อนุมัติแล้ว</TabsTrigger>
-          <TabsTrigger value='REJECTED'>ถูกปฏิเสธ</TabsTrigger>
-          <TabsTrigger value='ALL'>ทั้งหมด</TabsTrigger>
+          <TabsTrigger value='PENDING' className='hover:cursor-pointer'>
+            รออนุมัติ {counts.PENDING > 0 && `(${counts.PENDING})`}
+          </TabsTrigger>
+          <TabsTrigger value='APPROVED' className='hover:cursor-pointer'>
+            อนุมัติแล้ว {counts.APPROVED > 0 && `(${counts.APPROVED})`}
+          </TabsTrigger>
+          <TabsTrigger value='REJECTED' className='hover:cursor-pointer'>
+            ปฏิเสธ {counts.REJECTED > 0 && `(${counts.REJECTED})`}
+          </TabsTrigger>
+          <TabsTrigger value='ALL' className='hover:cursor-pointer'>ทั้งหมด</TabsTrigger>
         </TabsList>
       </Tabs>
 
       {isLoading ?
-        <div className='space-y-2'>
+        <div className='space-y-3'>
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton
               key={i}
-              className='h-16 w-full'
+              className='h-24 w-full rounded-lg'
             />
           ))}
         </div>
-      : <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ผู้แสดงความคิดเห็น</TableHead>
-              <TableHead>เนื้อหา</TableHead>
-              <TableHead>บทความ</TableHead>
-              <TableHead>สถานะ</TableHead>
-              <TableHead>วันที่</TableHead>
-              <TableHead className='text-right'>การจัดการ</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {comments?.map((comment) => (
-              <TableRow key={comment.id}>
-                <TableCell className='font-medium'>
-                  {comment.authorName}
-                </TableCell>
-                <TableCell className='max-w-xs truncate'>
-                  {comment.content}
-                </TableCell>
-                <TableCell>
+      : <div className='space-y-3'>
+          {comments?.map((comment) => (
+            <div
+              key={comment.id}
+              className='border rounded-lg px-4 py-3 flex items-start justify-between gap-4'
+            >
+              {/* Left: content */}
+              <div className='flex-1 min-w-0'>
+                <div className='flex items-center gap-2 mb-1'>
+                  <span className='font-medium text-sm'>
+                    {comment.authorName}
+                  </span>
+                  <Badge
+                    variant={statusVariant[comment.status]}
+                    className='text-xs'
+                  >
+                    {statusLabel[comment.status]}
+                  </Badge>
+                </div>
+                <p className='text-sm text-foreground'>{comment.content}</p>
+                <p className='text-xs text-muted-foreground mt-1'>
+                  บน{' '}
                   <Link
                     href={`/blogs/${comment.blog.slug}`}
                     target='_blank'
-                    className='text-primary hover:underline text-sm'
+                    className='hover:underline'
                   >
-                    {comment.blog.title}
+                    &quot;{comment.blog.title}&quot;
                   </Link>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={statusVariant[comment.status]}>
-                    {statusLabel[comment.status]}
-                  </Badge>
-                </TableCell>
-                <TableCell className='text-sm text-muted-foreground'>
+                  {' · '}
                   {dateFormatter.format(new Date(comment.createdAt))}
-                </TableCell>
-                <TableCell className='text-right space-x-2'>
-                  <Button
-                    size='sm'
-                    variant='outline'
-                    disabled={
-                      comment.status === 'APPROVED' || approveComment.isPending
-                    }
-                    onClick={() => handleApprove(comment.id)}
-                  >
-                    อนุมัติ
-                  </Button>
-                  <Button
-                    size='sm'
-                    variant='destructive'
-                    disabled={
-                      comment.status === 'REJECTED' || rejectComment.isPending
-                    }
-                    onClick={() => handleReject(comment.id)}
-                  >
-                    ปฏิเสธ
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                </p>
+              </div>
+
+              {/* Right: actions */}
+              <div className='flex items-center gap-2 shrink-0'>
+                <Button
+                  size='sm'
+                  disabled={
+                    comment.status === 'APPROVED' || approveComment.isPending
+                  }
+                  onClick={() => handleApprove(comment.id)}
+                >
+                  <Check className='h-3.5 w-3.5 mr-1' />
+                  อนุมัติ
+                </Button>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  disabled={
+                    comment.status === 'REJECTED' || rejectComment.isPending
+                  }
+                  onClick={() => handleReject(comment.id)}
+                >
+                  <X className='h-3.5 w-3.5 mr-1' />
+                  ปฏิเสธ
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
       }
 
       {comments?.length === 0 && (
