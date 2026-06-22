@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
@@ -7,8 +8,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CLOUDINARY } from './cloudinary.provider';
-import * as streamifier from 'streamifier';
 import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
+// import * as streamifier from 'streamifier';
+const streamifier = require('streamifier') as {
+  createReadStream: (buffer: Buffer) => NodeJS.ReadableStream;
+};
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; //5MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
