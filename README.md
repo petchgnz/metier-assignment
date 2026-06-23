@@ -291,11 +291,15 @@ npm run dev
 
 ## 🔐 Security Notes
 
-- JWT Token เก็บใน Cookie (ไม่ใช่ localStorage) เพื่อความปลอดภัย
+- JWT Token เก็บใน Cookie (ไม่ใช่ localStorage) เพื่อความปลอดภัย[^1]
 - Password ถูก Hash ด้วย bcrypt (salt rounds: 10)
 - Comment Validation ใช้ Regex เดียวกันทั้ง Frontend และ Backend
 - CORS ถูก configure ให้รับแค่จาก `FRONTEND_URL` ที่กำหนด
 - Swagger UI ถูกปิดอัตโนมัติเมื่อ `NODE_ENV=production`
+
+[^1]: ใช้แค่ JWT 
+
+
 
 ---
 

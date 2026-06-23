@@ -18,7 +18,11 @@ const DETAIL_PAGE_PATTERNS = [
   /^\/admin\/blogs\/\d+\/edit$/,
 ];
 
-export default function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
+export default function ProtectedAdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -28,44 +32,59 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
   }
 
   const activeTab =
-    navItems.find((item) => pathname.startsWith(item.href))?.href ?? navItems[0].href;
+    navItems.find((item) => pathname.startsWith(item.href))?.href ?? '';
 
-  const isDetailPage = DETAIL_PAGE_PATTERNS.some((pattern) => pattern.test(pathname));
+  const isDetailPage = DETAIL_PAGE_PATTERNS.some((pattern) =>
+    pattern.test(pathname),
+  );
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b h-14 flex items-center shrink-0">
-        <div className="max-w-5xl mx-auto px-8 w-full flex items-center justify-between">
-          <span className="font-bold text-base">แผงควบคุมผู้ดูแลระบบ</span>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/blogs">
-                <Home className="h-4 w-4 mr-1" />
+    <div className='min-h-screen flex flex-col'>
+      <header className='border-b h-14 flex items-center shrink-0'>
+        <div className='max-w-5xl mx-auto px-8 w-full flex items-center justify-between'>
+          <span className='font-bold text-base'>แผงควบคุมผู้ดูแลระบบ</span>
+          <div className='flex items-center gap-2'>
+            <Button
+              variant='ghost'
+              size='sm'
+              asChild
+            >
+              <Link href='/blogs'>
+                <Home className='h-4 w-4 mr-1' />
                 หน้าเว็บ
               </Link>
             </Button>
             <ThemeToggle />
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-1" />
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={handleLogout}
+            >
+              <LogOut className='h-4 w-4 mr-1' />
               ออกจากระบบ
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="mt-8">
-        <div className="max-w-5xl mx-auto px-8">
-          <Tabs value={activeTab} onValueChange={(href) => router.push(href)}>
+      <div className='mt-8'>
+        <div className='max-w-5xl mx-auto px-8'>
+          <Tabs
+            value={activeTab}
+            onValueChange={(href) => {
+              if (href !== pathname) router.push(href)
+            }}
+          >
             <TabsList
               className={`${
                 isDetailPage ? 'opacity-40 pointer-events-none select-none' : ''
-              }`}
+              }gap-1`}
             >
               {navItems.map((item) => (
                 <TabsTrigger
                   key={item.href}
                   value={item.href}
-                  className='hover:cursor-pointer'
+                  className={`hover:cursor-pointer hover:not-focus:bg-primary-foreground `}
                 >
                   {item.label}
                 </TabsTrigger>
@@ -75,10 +94,8 @@ export default function ProtectedAdminLayout({ children }: { children: React.Rea
         </div>
       </div>
 
-      <main className="flex-1">
-        <div className="max-w-5xl mx-auto px-8 py-6">
-          {children}
-        </div>
+      <main className='flex-1'>
+        <div className='max-w-5xl mx-auto px-8 py-6'>{children}</div>
       </main>
     </div>
   );
