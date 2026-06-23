@@ -48,6 +48,7 @@ export class BlogService {
           slug: true,
           excerpt: true,
           coverImageUrl: true,
+          viewCount: true,
           createdAt: true,
         },
         orderBy: { createdAt: 'desc' },

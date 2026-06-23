@@ -7,6 +7,7 @@ export interface BlogListItem {
   slug: string;
   excerpt: string;
   coverImageUrl: string;
+  viewCount: number;
   createdAt: string;
 }
 
